@@ -1,0 +1,47 @@
+Metasequoia Document
+Format Text Ver 1.1
+
+Scene {
+	pos 1.90734863e-06 0 937.50946
+	lookat 37.0610008 43.9813957 -47.4422226
+	head -0.0336
+	pich 0.0636
+	bank 0.0000
+	ortho 0
+	zoom2 8.0000
+	amb 0.250 0.250 0.250
+	frontclip 140.626419
+	backclip 28125.2832
+	dirlights 1 {
+		light {
+			dir 0.408 0.408 0.816
+			color 1.000 1.000 1.000
+		}
+	}
+}
+Material 1 {
+	"material" shader(3) col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00)
+}
+Object "triangle" {
+	depth 0
+	folding 0
+	scale 1 1 1
+	rotation 0 0 0
+	translation 0 0 0
+	visible 15
+	locking 0
+	shading 1
+	facet 59.5
+	normal_weight 1
+	color 0.898 0.498 0.698
+	color_type 0
+	vertex 3 {
+		0 0 0
+		100 0 0
+		100 100 0
+	}
+	face 1 {
+		3 V(2 1 0) M(0) UV(1 1 1 0 0 0)
+	}
+}
+Eof

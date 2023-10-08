@@ -49,6 +49,9 @@ class MqoIOTest {
         private val case7File =
             this::class.java.classLoader.getResourceAsStream("dev/siro256/mqoio/MqoIOTest/case7.mqo")!!
                 .readBytes().wrap()
+        private val case8File =
+            this::class.java.classLoader.getResourceAsStream("dev/siro256/mqoio/MqoIOTest/case8.mqo")!!
+                .readBytes().wrap()
         private val case1ExpectedModel =
             Model(emptyList())
         private val case2ExpectedModel =
@@ -263,7 +266,7 @@ class MqoIOTest {
                     ),
                 )
             )
-        private val case5AndCase6ExpectedModel =
+        private val case5ToCase7ExpectedModel =
             Model(
                 listOf(
                     Model.Object(
@@ -292,7 +295,7 @@ class MqoIOTest {
                     )
                 )
             )
-        private val case7ExpectedModel =
+        private val case8ExpectedModel =
             Model(
                 listOf(
                     Model.Object(
@@ -331,7 +334,8 @@ class MqoIOTest {
          * | 3         | 2           | yes          | yes     | yes               | ASCII     | UTF-8    | mqoz      | Mirrored face                                         |
          * | 1         | 1           | yes          | yes     | no                | Japanese  | UTF-8    | mqoz      | Japanese model name and material name with UTF-8      |
          * | 1         | 1           | yes          | yes     | no                | Japanese  | ShiftJIS | mqoz      | Japanese model name and material name with ShiftJIS   |
-         * | 1         | 1           | yes          | yes     | no                | ASCII     | UTF-8    | mqo       | Uncompressed format                                   |
+         * | 1         | 1           | yes          | yes     | no                | Japanese  | ShiftJIS | mqo       | ShiftJIS with uncompressed format                     |
+         * | 1         | 1           | yes          | yes     | no                | ASCII     | UTF-8    | mqo       | Simple uncompressed format                            |
          */
         @JvmStatic
         fun testDataProvider() =
@@ -340,9 +344,10 @@ class MqoIOTest {
                 Arguments.of(case2File, case2ExpectedModel),
                 Arguments.of(case3File, case3ExpectedModel),
                 Arguments.of(case4File, case4ExpectedModel),
-                Arguments.of(case5File, case5AndCase6ExpectedModel),
-                Arguments.of(case6File, case5AndCase6ExpectedModel),
-                Arguments.of(case7File, case7ExpectedModel)
+                Arguments.of(case5File, case5ToCase7ExpectedModel),
+                Arguments.of(case6File, case5ToCase7ExpectedModel),
+                Arguments.of(case7File, case5ToCase7ExpectedModel),
+                Arguments.of(case8File, case8ExpectedModel)
             )
 
         private fun ByteArray.wrap() = SimpleToStringByteArray(this)

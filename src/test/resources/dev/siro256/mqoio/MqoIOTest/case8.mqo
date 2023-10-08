@@ -1,18 +1,17 @@
 Metasequoia Document
 Format Text Ver 1.1
-CodePage 932
 
 Scene {
-	pos -0.127031326 0 937.508911
-	lookat 40.793354 47.1800308 -43.6623535
-	head -0.0236
-	pich 0.1308
+	pos 1.90734863e-06 0 937.50946
+	lookat 37.0610008 43.9813957 -47.4422226
+	head -0.0336
+	pich 0.0636
 	bank 0.0000
 	ortho 0
 	zoom2 8.0000
 	amb 0.250 0.250 0.250
-	frontclip 140.626343
-	backclip 28125.2676
+	frontclip 140.626419
+	backclip 28125.2832
 	dirlights 1 {
 		light {
 			dir 0.408 0.408 0.816
@@ -21,9 +20,9 @@ Scene {
 	}
 }
 Material 1 {
-	"マテリアル" shader(3) col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00)
+	"material" shader(3) col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00)
 }
-Object "三角形" {
+Object "triangle" {
 	depth 0
 	folding 0
 	scale 1 1 1

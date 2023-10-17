@@ -13,7 +13,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation("dev.siro256.modelio:ModelIO:0.1.0-SNAPSHOT")
+    implementation("dev.siro256.modelio:ModelIO:0.1.1-SNAPSHOT")
     implementation("dev.siro256.fastset:FastSet:0.1.0-SNAPSHOT")
     implementation("cc.ekblad.konbini:konbini:0.1.2")
     implementation("com.github.albfernandez:juniversalchardet:2.4.0")

@@ -63,7 +63,7 @@ class MqoIOTest {
                         listOf(
                             Model.Face(
                                 Optional.of("material"),
-                                Model.Vector3f(0.0f, 0.0f, -1.0f),
+                                Model.Vector3f(0.0f, 0.0f, 1.0f),
                                 Model.Vertex(
                                     Model.Vector3f(0.0f, 0.0f, 0.0f),
                                     Optional.empty(),
@@ -92,7 +92,7 @@ class MqoIOTest {
                         listOf(
                             Model.Face(
                                 Optional.empty(),
-                                Model.Vector3f(0.0f, 0.0f, -1.0f),
+                                Model.Vector3f(0.0f, 0.0f, 1.0f),
                                 Model.Vertex(
                                     Model.Vector3f(0.0f, 0.0f, 0.0f),
                                     Optional.empty(),
@@ -111,7 +111,7 @@ class MqoIOTest {
                             ),
                             Model.Face(
                                 Optional.of("material"),
-                                Model.Vector3f(0.0f, 0.0f, -1.0f),
+                                Model.Vector3f(0.0f, 0.0f, 1.0f),
                                 Model.Vertex(
                                     Model.Vector3f(1.0f, 1.0f, 0.0f),
                                     Optional.empty(),
@@ -202,7 +202,7 @@ class MqoIOTest {
                             ),
                             Model.Face(
                                 Optional.of("material"),
-                                Model.Vector3f(-1.0f, 0.0f, 0.0f),
+                                Model.Vector3f(1.0f, 0.0f, 0.0f),
                                 Model.Vertex(
                                     Model.Vector3f(0.0f, -1.0f, 1.0f),
                                     Optional.empty(),

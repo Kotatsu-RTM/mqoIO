@@ -1,6 +1,7 @@
 package dev.siro256.mqoio
 
 import cc.ekblad.konbini.*
+import dev.siro256.fastset.FastIndexSet
 import dev.siro256.modelio.Model
 import dev.siro256.modelio.ModelIO
 import dev.siro256.mqoio.types.*
@@ -11,6 +12,7 @@ import java.util.*
 import java.util.zip.ZipInputStream
 import kotlin.collections.ArrayList
 import kotlin.jvm.optionals.getOrNull
+import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -473,7 +475,9 @@ object MqoIO : ModelIO {
     }
 
     private fun checkHeaderAndCharset(byteArray: ByteArray): Result<Charset> {
-        val top = ByteArray(64).apply { System.arraycopy(byteArray, 0, this, 0, 64) }.decodeToString()
+        val destinationSize = min(64, byteArray.size)
+        val top = ByteArray(destinationSize).apply { System.arraycopy(byteArray, 0, this, 0, destinationSize) }
+            .decodeToString()
 
         val result = try {
             pTop.parse(top)
@@ -528,6 +532,116 @@ object MqoIO : ModelIO {
     }
 
     override fun export(model: Model): Result<ByteArray> {
-        TODO("Not yet implemented")
+        val builder = StringBuilder()
+
+        builder.appendLine("Metasequoia Document")
+            .appendLine("Format Text Ver 1.2")
+            .appendLine("CodePage utf8")
+
+        val materials = model.collectAllMaterials()
+        if (materials.isNotEmpty()) {
+            builder.appendLine("")
+                .appendLine("Material ${materials.size} {")
+
+            materials.forEach { builder.appendLine("    \"${it}\"") }
+
+            builder.appendLine("}")
+        }
+
+        if (model.objects.isNotEmpty()) {
+            model.objects.forEach { modelObject ->
+                val optimizedObject =
+                    modelObject.optimizeToExport(materials).onFailure { return Result.failure(it) }.getOrThrow()
+
+                builder.appendLine("")
+                    .appendLine("Object \"${optimizedObject.name}\" {")
+                    .appendLine("    depth 0")
+
+                val vertices = optimizedObject.vertex.value
+                builder.appendLine("    vertex ${vertices.size} {")
+                vertices.forEach { builder.appendLine("        ${it.first} ${it.second} ${it.third}") }
+                builder.appendLine("    }")
+
+                val faces = optimizedObject.face.value
+                builder.appendLine("    face ${faces.size} {")
+                faces.forEach { face ->
+                    val faceVertices = face.v.value
+
+                    builder.append("        ")
+                        .append(faceVertices.size)
+                        .append(" V(${faceVertices.joinToString(separator = " ")})")
+
+                    face.m.ifPresent { builder.append(" M(${it.value})") }
+                    face.uv.ifPresent { uv ->
+                        builder.append("UV(${uv.value.joinToString(separator = " ") { "${it.first} ${it.second}" }})")
+                    }
+
+                    builder.appendLine("")
+                }
+                builder.appendLine("    }")
+
+                builder.appendLine("}")
+            }
+        }
+
+        builder.appendLine("Eof")
+
+        return Result.success(builder.toString().toByteArray(Charsets.UTF_8))
+    }
+
+    private fun StringBuilder.appendLine(text: String) = append(text).append("\r\n")
+
+    private fun Model.collectAllMaterials() =
+        objects.flatMap { modelObject -> modelObject.faces.mapNotNull { it.material.getOrNull() } }.distinct()
+
+    private fun Model.Object.optimizeToExport(materials: List<String>): Result<MqoObject> {
+        val vertices = FastIndexSet<Triple<Float, Float, Float>>()
+        val optimizedFaces = mutableListOf<MqoFace>()
+
+        faces.forEach { face ->
+            fun Model.Vector2f.toPair() = x to y
+
+            fun Model.Vector3f.toTriple() = Triple(x, y, z)
+
+            val faceVertices = arrayListOf(
+                face.first.coordinate.toTriple(),
+                face.second.coordinate.toTriple(),
+                face.third.coordinate.toTriple()
+            ).mapTo(ArrayList()) { Triple(it.first * 100.0f, it.second * 100.0f, it.third * 100.0f) }
+                .reversed()
+
+            val faceUVs = arrayListOf(
+                face.first.uv.getOrNull()?.toPair(),
+                face.second.uv.getOrNull()?.toPair(),
+                face.third.uv.getOrNull()?.toPair()
+            ).filterNotNullTo(arrayListOf())
+                .reversed()
+
+            if (faceUVs.isNotEmpty() && faceUVs.size != faceVertices.size)
+                return Result.failure(
+                    MqoIOException.IllegalStateException("Size of vertices and size of UVs are not same.")
+                )
+
+            vertices.addAll(faceVertices)
+
+            optimizedFaces.add(
+                MqoFace(
+                    MqoFace.Element.V(ArrayList(faceVertices.mapTo(arrayListOf()) { vertices.indexOf(it) })),
+                    Optional.ofNullable(face.material.getOrNull()?.let { MqoFace.Element.M(materials.indexOf(it)) }),
+                    if (faceUVs.isEmpty()) Optional.empty() else Optional.of(MqoFace.Element.UV(ArrayList(faceUVs)))
+            ))
+        }
+
+        return Result.success(MqoObject(
+            name,
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            MqoObject.Element.Vertex(ArrayList(vertices)),
+            MqoObject.Element.Face(optimizedFaces)
+            ))
     }
 }
